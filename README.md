@@ -13,6 +13,12 @@
 - 项目介绍：https://www.jxshn.com/2429.html
 - GitHub 仓库：https://github.com/xielaoban-pro/jinxi-audio-to-text
 
+## 网盘下载
+
+- 百度网盘：https://pan.baidu.com/s/1h6E7rHoYIRH3h6COL6zhNw?pwd=eqwp
+  - 提取码：`eqwp`
+- 夸克网盘：https://pan.quark.cn/s/737027169871
+
 ## 项目特点
 
 - 不需要自建转写后端，主要流程在访客浏览器中完成
