@@ -1,0 +1,26 @@
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / temp files
+*.log
+*.tmp
+*.temp
+*.bak
+*~
+
+# Node / tooling
+node_modules/
+dist/
+coverage/
+.cache/
+
+# Local environment
+.env
+.env.*
+
+# Optional archives
+*.zip
+*.rar
+*.7z

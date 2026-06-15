@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>今夕在线音频转文本工具</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: rgba(255, 250, 242, 0.92);
+      --panel-strong: #fffaf2;
+      --text: #1f1d18;
+      --muted: #6c665c;
+      --line: #ddd1bf;
+      --primary: #0f766e;
+      --primary-soft: rgba(15, 118, 110, 0.10);
+      --accent: #c46a15;
+      --accent-soft: rgba(196, 106, 21, 0.10);
+      --danger: #b42318;
+      --shadow: 0 18px 48px rgba(46, 40, 28, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(196, 106, 21, 0.12), transparent 24rem),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 24rem),
+        linear-gradient(180deg, #f8f3ea 0%, #f1eadf 100%);
+      min-height: 100vh;
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 28px));
+      margin: 18px auto 28px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      margin-bottom: 18px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #164e63);
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.68);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(15, 118, 110, 0.24);
+      background: #fff;
+    }
+
+    .nav-link.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .nav-link.primary:hover {
+      background: #0b615a;
+      border-color: #0b615a;
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.02;
+      max-width: 9ch;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      align-items: end;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero-points {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hero-points div {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .row > .field {
+      flex: 1 1 220px;
+    }
+
+    .field label,
+    .block-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.18));
+      transition: border-color 120ms ease, transform 120ms ease, background 120ms ease;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(15, 118, 110, 0.08);
+      transform: translateY(-1px);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffdf9;
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.08);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, opacity 120ms ease, background 120ms ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .primary { background: var(--primary); color: white; }
+    .secondary { background: var(--accent); color: white; }
+    .ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+    .danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid rgba(180, 35, 24, 0.18);
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.5);
+    }
+
+    .mode-switch button {
+      padding: 9px 14px;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .mode-switch button.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .status {
+      min-height: 22px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status.success { color: var(--primary); }
+    .status.error { color: var(--danger); }
+
+    .progress-shell {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.52);
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .progress-stage {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .progress-percent {
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 700;
+      min-width: 54px;
+      text-align: right;
+    }
+
+    .progress-bar {
+      position: relative;
+      overflow: hidden;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.10);
+      border: 1px solid rgba(15, 118, 110, 0.12);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), #22a39a);
+      transition: width 180ms ease;
+    }
+
+    .progress-shell.indeterminate .progress-fill {
+      width: 36%;
+      position: absolute;
+      animation: progress-slide 1.2s linear infinite;
+    }
+
+    .progress-detail {
+      min-height: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    @keyframes progress-slide {
+      0% { left: -36%; }
+      100% { left: 100%; }
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.45);
+      display: grid;
+      gap: 6px;
+    }
+
+    .meta-card span {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .timeline-list {
+      display: grid;
+      gap: 8px;
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.44);
+    }
+
+    .timeline-time {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      font-family: Consolas, monospace;
+    }
+
+    .mono {
+      font-family: Consolas, monospace;
+    }
+
+    .tip {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(196, 106, 21, 0.18);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100vw - 16px, 1180px);
+        margin: 8px auto 20px;
+      }
+
+      .topbar,
+      .hero,
+      .panel {
+        padding: 18px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-left,
+      .top-nav {
+        width: 100%;
+      }
+
+      .top-nav {
+        justify-content: flex-start;
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar card">
+      <div class="topbar-left">
+        <div class="brand">
+          <div class="brand-mark">A</div>
+          <div>
+            <div>DevTools</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:600;">今夕在线音频转文本工具</div>
+          </div>
+        </div>
+        <div class="badge">静态 Whisper 演示</div>
+      </div>
+      <nav class="top-nav" aria-label="页面导航">
+        <a class="nav-link" href="https://www.jxshn.com/" target="_blank" rel="noopener noreferrer">今夕资源网</a>
+        <a class="nav-link primary" href="https://www.jxshn.com/tools/gongju/audio-subtitle/transcribe.php" target="_blank" rel="noopener noreferrer">在线预览</a>
+        <a class="nav-link" href="https://www.jxshn.com/2429.html" target="_blank" rel="noopener noreferrer">项目介绍</a>
+        <a class="nav-link" href="https://github.com/xielaoban-pro/jinxi-audio-to-text" target="_blank" rel="noopener noreferrer">GitHub 开源</a>
+      </nav>
+    </header>
+
+    <section class="hero card">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <h1>今夕在线音频转文本工具</h1>
+          <p>更接近目标网站的完整工具页形态。支持本地上传、URL 导入、浏览器内转写、分段结果预览，以及 SRT / LRC / TXT 导出。</p>
+        </div>
+        <div class="hero-points">
+          <div>全部在浏览器内处理，不依赖你自己的转写后端。</div>
+          <div>首次使用会下载 Whisper 模型，后续会走浏览器缓存。</div>
+          <div>适合静态部署到本地目录、Nginx、GitHub Pages 这类环境。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <section class="panel card">
+        <div class="stack">
+          <div class="row" style="justify-content:space-between;">
+            <h2>音频输入</h2>
+            <div class="mode-switch">
+              <button id="mode-file-btn" class="active" type="button">本地上传</button>
+              <button id="mode-url-btn" type="button">链接导入</button>
+            </div>
+          </div>
+
+          <div id="dropzone" class="dropzone">
+            <div class="row">
+              <button id="pick-file-btn" class="primary" type="button">选择音频文件</button>
+              <button id="load-sample-btn" class="ghost" type="button">加载当前链接</button>
+            </div>
+            <p style="margin-top:12px;">支持拖拽音频文件到这里，也可以切换到 URL 模式直接加载公网音频链接。</p>
+            <input id="audio-file" type="file" accept="audio/*">
+          </div>
+
+          <div id="url-panel" class="stack hidden">
+            <div class="field">
+              <label for="audio-url">音频链接</label>
+              <input id="audio-url" type="text" placeholder="https://example.com/demo.mp3">
+            </div>
+            <div class="row">
+              <button id="load-url-btn" class="secondary" type="button">加载 URL</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="language">识别语言</label>
+              <select id="language">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本语</option>
+                <option value="auto">自动检测</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="format">导出格式</label>
+              <select id="format">
+                <option value="srt">SRT</option>
+                <option value="lrc">LRC</option>
+                <option value="txt">TXT</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="script-mode">输出字形</label>
+              <select id="script-mode">
+                <option value="original">原始识别结果</option>
+                <option value="simplified">简体中文</option>
+                <option value="traditional">繁体中文</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="model-name">识别模型</label>
+              <select id="model-name">
+                <option value="Xenova/whisper-tiny">whisper-tiny（更快）</option>
+                <option value="Xenova/whisper-base">whisper-base（更准）</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="model-source">模型来源</label>
+              <select id="model-source">
+                <option value="remote">远端模型仓库（默认）</option>
+                <option value="local">本地模型目录</option>
+              </select>
+            </div>
+          </div>
+
+          <audio id="player" controls></audio>
+
+          <div class="row">
+            <button id="transcribe-btn" class="primary" type="button">开始转字幕</button>
+            <button id="download-btn" class="secondary" type="button" disabled>下载字幕</button>
+            <button id="copy-btn" class="ghost" type="button" disabled>复制结果</button>
+            <button id="clear-btn" class="danger" type="button">清空</button>
+          </div>
+
+          <div id="progress-shell" class="progress-shell hidden">
+            <div class="progress-head">
+              <div id="progress-stage" class="progress-stage">准备中</div>
+              <div id="progress-percent" class="progress-percent">0%</div>
+            </div>
+            <div class="progress-bar">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div id="progress-detail" class="progress-detail">等待任务开始。</div>
+          </div>
+
+          <div id="status" class="status">等待上传音频。</div>
+
+          <div class="meta-grid">
+            <div class="meta-card">
+              <span>模型</span>
+              <strong id="meta-model-name">Xenova/whisper-tiny</strong>
+            </div>
+            <div class="meta-card">
+              <span>模型来源</span>
+              <strong id="meta-model-source">远端模型仓库</strong>
+            </div>
+            <div class="meta-card">
+              <span>运行方式</span>
+              <strong>Web Worker + Transformers.js</strong>
+            </div>
+          </div>
+
+          <div class="tip">
+            目前本地目录已预置 `whisper-tiny` 和 `whisper-base`。tiny 更快，base 更稳但加载和转写会更慢。
+          </div>
+        </div>
+      </section>
+
+      <section class="panel card">
+        <div class="stack">
+          <div class="row" style="justify-content:space-between;">
+            <h2>字幕输出</h2>
+            <div style="color:var(--muted);font-size:13px;">带时间戳分段预览</div>
+          </div>
+
+          <div class="field">
+            <label for="output">导出文本</label>
+            <textarea id="output" placeholder="转写结果会显示在这里。"></textarea>
+          </div>
+
+          <div class="field">
+            <div class="block-label">时间分段</div>
+            <div id="segments" class="timeline-list">
+              <div style="color:var(--muted);font-size:14px;">暂无结果。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./vendor/opencc-full.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
