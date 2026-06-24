@@ -1,5 +1,7 @@
 # 今夕在线音频转文本工具
 
+中文 | [English](./README.en.md)
+
 一个浏览器端音频转文字、音频转字幕的静态网页工具。它使用 Transformers.js 在浏览器中运行 Whisper 模型，支持上传音频、试听、转写、分段预览，并导出 SRT、LRC、TXT。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
